@@ -5,9 +5,9 @@ const app = express();
 //importe mongoose
 const mongoose = require('mongoose');
 
-const booksRoutes = require('./routes/books');
-const authRoutes = require('./routes/auth');
-
+const booksRoutes = require('./routes/routesBooks');
+const authRoutes = require('./routes/routesAuth');
+const path = require('path');
 //lie à MongoDB
 mongoose.connect('mongodb+srv://AudeRey:yFAc2RXaOq5ekyKl@cluster0.x4nhhec.mongodb.net/?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -24,20 +24,11 @@ app.use((req, res, next) => {
     next();
   });
 
-  // app.use('/api/books', (req, res, next) => {
-  //   const token = req.headers('Authorization').split(' ')[1];
-  //   if(token.isExpired){
-  //       next({code: 401, message: 'Unauthorized'});
-  //   }
-  //   if(token.isExpired){
-  //     return res.status(401).json({message: 'Unauthorized'});
-  //   }
-  //   next();
-  // })
-
 //renvoie du express en JSON
 app.use(express.json());
+app.use('/image', express.static(path.join(_dirname, 'images')))
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', authRoutes);
+
 
 module.exports = app;
