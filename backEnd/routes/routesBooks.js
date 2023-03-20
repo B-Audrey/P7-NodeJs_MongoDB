@@ -1,19 +1,22 @@
+//importe express
 const express = require('express');
-const { findOne } = require('../models/modelBook');
-const auth = require('auth')
+// POURQUOI ? JAMAIS LUE ?
+// const { findOne } = require('../models/modelBook');
+//importe les fichiers avec les fonctions qui vont être lues les unes après les autres dans les routes
+const auth = require('../middlewares/auth')
 const multer = require('../middlewares/multer-config')
-const bookControllers = require('../controllers/controlsBook');
-
+const bookCtrls = require('../controllers/controlsBook');
+//stocke les routes express dans la variable router
 const router = express.Router();
 
 // ROUTES ici
-router.get('/', bookControllers.getAllBooks);
-router.get('/bestrating', bookControllers.getBestBooks);
-router.get('/:id', bookControllers.getBookById);
-router.post('/', auth, multer, bookControllers.createNewBook);
-router.post('/:id/rating', auth, bookControllers.addNewGrade, bookControllers.CalcAverageRating)
-router.put('/:id', auth, multer, bookControllers.updateBook);
-router.delete('/:id', auth, multer, bookControllers.deleteBook);
+router.get('/', bookCtrls.getAllBooks);
+router.get('/bestrating', bookCtrls.getBestBooks);
+router.get('/:id', bookCtrls.getBookById);
+router.post('/', auth, multer, bookCtrls.createNewBook);
+router.post('/:id/rating', auth, bookCtrls.addNewGrade, bookCtrls.CalcAverageRating)
+router.put('/:id', auth, multer, bookCtrls.updateBook);
+router.delete('/:id', auth, multer, bookCtrls.deleteBook);
 
 
 module.exports = router;

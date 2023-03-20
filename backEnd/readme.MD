@@ -3,13 +3,17 @@ iD : AudeRey
 password : yFAc2RXaOq5ekyKl
 
 
-JSON pour ajout à la DB
+JSON pour ajout d'un Book à la DB
 {
 "userId": "toto",
 "title": "Toto est à la montagne",
 "author": "nous",
-"imageUrl": "http://img.fr",
 "year": 2019,
 "genre": "Aventure",
-"averageRating": 8
+}
+
+JSON pour ajout d'un User à la DB
+{
+    "email": "audrey@moi.fr",
+    "password": "MotDePasse"
 }
