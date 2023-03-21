@@ -1,7 +1,7 @@
 //importe le schema mongoose Book défini
 const Book = require('../models/modelBook');
 
-//VOIR DOC sur FileSystem
+//utilise FileSystem
 const fs = require('fs');
 
 exports.getAllBooks = async (req, res, next) => {  
@@ -12,7 +12,7 @@ exports.getAllBooks = async (req, res, next) => {
         return res.status(200).json(books);
     }    
     catch (error) {
-        res.status(404).json({ error });
+        return res.status(404).json({ error });
     }
 }
 
@@ -24,7 +24,7 @@ exports.getBookById = async (req, res, next) => {
         return res.status(200).json(book);
     }
     catch (error) {
-        res.status(404).json({ error });
+        return res.status(404).json({ error });
     }
 }
 
@@ -44,17 +44,14 @@ exports.getBestBooks = async (req, res, next) =>{
         return res.status(200).json(bestBooks);
     }
     catch (error){
-        res.status(404).json({ error });
+        return res.status(404).json({ error });
     } 
 }
 
 exports.createNewBook = async (req, res, next) =>{
     //stock le body de la requete parsée en JSON
-    const receivedBookObject = JSON.parse(req.body.book);
-    //supprime l'iD envoyé
-    delete receivedBookObject._id;
-    //supprime l'iD de l'user envoyé
-    delete receivedBookObject._userId;
+    console.log('je rentre dans la création d un book')
+    const receivedBookObject = req.body.book;
     try {
         //génère un nouveau book
         const book = new Book({
@@ -62,11 +59,12 @@ exports.createNewBook = async (req, res, next) =>{
             ...receivedBookObject,
             //y ajoute l'iD de l'user qui est dans la requete
             userId: req.auth.userId,
-            //y ajoute l'image de l'url reconstituée : protocole de la requete .... ?????? A REVOIR
+            //y ajoute l'url reconstituée : protocole de la requete + req.get???
             imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
             // ajoute une avergae rating à -1 de base pour un affichage neutre avec averageRating >0
             averageRating:-1
             });
+            console.log(book.imageUrl);
         //enregistre le new book dans la DB
         await book.save();
         // renvoi le nouveau book
@@ -90,7 +88,7 @@ exports.addNewGrade = async(req, res, next) => {
         const gradeToPush = req.body.rating;
         //trouve le livre à modifer dans la DB avec l'iD des params de la requete
         const bookRateToUpdate = await Book.findOne({_id: req.params.id});
-        //crée un nouvel objet à envoyer à la DB avec les nouvelles infos !!!!! MODIFIER L'user ID par celui du token et pas celui du body
+        //crée un nouvel objet à envoyer à la DB avec les nouvelles infos !!!!! PENSER A MODIFIER l'user ID par celui du token et pas celui du body
         dataToPush = {userId : userIdToPush, grade: gradeToPush};
         //rempli le tableau du book a modifier en y ajoutant les nouvelles informations
         bookRateToUpdate.ratings.push(dataToPush);
@@ -100,7 +98,7 @@ exports.addNewGrade = async(req, res, next) => {
         next()
     }
     catch (error) {
-        res.status(400).json({ message : 'ajout de la note impossible' });
+        return res.status(400).json({ message : 'ajout de la note impossible' });
     }
 }
 //fonction de calcul de la moyenne
@@ -128,19 +126,21 @@ exports.CalcAverageRating = async(req, res, next) =>{
     bookAverageToUpdate.averageRating = newAverage;
     //sauvegarde dans la DB
     await bookAverageToUpdate.save();
-    res.status(201).json('note ajoutee avec succes')
+    return res.status(201).json('note ajoutee avec succes')
     }
     catch (error) {
-        res.status(400).json({ message : 'erreur sur la mise à jour de la note moyenne'});
+        return res.status(400).json({ message : 'erreur sur la mise à jour de la note moyenne'});
     }
 }
 
 exports.updateBook = async (req, res, next) => {
     try{
+        console.log('je rentre dans l update')
         //crée un nouvel objet
         let updatedBook = {};
         //entre si il y a un objet dans la requete
         if (!!req.file){
+            console.log('j ai un file')
             //stocke les infos du book envoyé en string dans une variable
             const stringReceivedBook = req.body.book;
             //parse le book en objet JSON
@@ -166,14 +166,14 @@ exports.updateBook = async (req, res, next) => {
         const bookToUpdate = await Book.findOne({_id: req.params.id});
         //si l'Id du user est différent de celui qui a créé le livre, on renvoi une erreur
         if (bookToUpdate.userId != req.auth.userId) {
-            req.status(401).json({ message: 'Non authorized'})
+            return req.status(401).json({ message: 'Non authorized'})
         } else {
             //si les id correspondent alors on mets le livre à jour
             await Book.updateOne({_id: req.params.id}, {updatedBook, _id: req.params.id})
         }
     }
     catch (error) {
-        res.status(400).json({ error });
+        return res.status(400).json({ error });
     }
 }
 
@@ -183,7 +183,7 @@ exports.deleteBook = async (req, res, next) => {
         const bookToDelete = await Book.findOne({_id: req.params.id});
         //si l'id envoyé est différent de celui du propriétaire du livre, on renvoi une erreur
         if (bookToDelete.userId != req.auth.userId) {
-            req.status(401).json({ message: 'Non authorized'})
+            return req.status(401).json({ message: 'Non authorized'})
         } else {
             //quand les id correspondent on recupère le file de l'image associé au book avec split(avant /image dans l'imageUrl du book recupéré)
             const fileName = bookToDelete.imageUrl.split('/images')[1];
@@ -195,6 +195,6 @@ exports.deleteBook = async (req, res, next) => {
         return res.status(200).json({message : 'livre supprime avec succes'});
     }
     catch (error) {
-        res.status(404).json({error});
+        return res.status(404).json({error});
     }
  }

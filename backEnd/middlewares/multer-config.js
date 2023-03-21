@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     //le nom a attribué au fichier qui sera stocké
     filename: (res, file, callback) => {
         //le nom du fichier prend le nom du fichier envoyé et split les valeursz entre chaque espace pour ensuite les assembler avec des "_"
-        const name = file.originalname.split('').join('_');
+        const name = file.originalname.split(' ').join('_');
         // recupère l'extension du ficher
         const extention = MIME_TYPE[file.mimetype];
         // fonction qui va assembler le nom du fichier avec le name récupéré, la date pour s'assurer d'avoir un nom unique, un . et l'extension
@@ -25,4 +25,11 @@ const storage = multer.diskStorage({
     }
  });
 
-module.exports = multer({ storage }).single('image');
+ //exporte storage de multer en acceptant un "single" fichier qui sera une "image" (peut aussi renvoyer un array par ex.)
+ // multer accroche le file au body
+module.exports = (req, res, next) => {
+    console.log('je rentre dans le multer')    
+    multer({ storage }).single('image');
+    console.log('je sors du multer')
+    next()
+}

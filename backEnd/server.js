@@ -46,7 +46,7 @@ const errorHandler = error => {
   }
 };
 
-// déclare le server et lui attribue les méthodes d'écoute http avec la méthode create server
+//déclare le server et lui attribue les méthodes d'écoute http avec la méthode create server
 //et prends en param le fichier app pour exectuer les instructions qui seront dedans
 const server = http.createServer(app);
 
