@@ -53,7 +53,7 @@ exports.createNewBook = async (req, res, next) =>{
     console.log(req.body);
     console.log('je rentre dans la création d un book');
     
-    const receivedBookObject = req.body.book;
+    const receivedBookObject = JSON.parse(req.body.book);
     try {
         //génère un nouveau book
         const book = new Book({

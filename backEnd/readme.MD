@@ -1,11 +1,3 @@
-MONGO DB admin
-iD : AudeRey
-password : yFAc2RXaOq5ekyKl
-MONGO DB visitor
-iD : visitor
-password: Wf4YsWRTMmBeJiWY
-
-
 JSON pour ajout d'un Book à la DB
 {
 "userId": "toto",
