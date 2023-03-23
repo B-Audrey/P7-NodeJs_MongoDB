@@ -20,7 +20,7 @@ const normalizePort = (val) => {
 };
 
 // défini port avec la fonction et passe le numéro en argument (si le premier : un port configuré par défaut est false, alors prends 3000)
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '4000');
 // utilise la méthode set avec le port défini
 // POURQUOI SET ? QUELLE UTILITE DE CETTE LIGNE ?
 app.set('port', port);

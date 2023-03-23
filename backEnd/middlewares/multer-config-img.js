@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     //la destination de stockage en callback
     destination: (req, file, callback) =>{
         //fonction qui prend en param que faire en cas d'echec puis en cas de réussite, indique le chemin de stockage du fichier
-        callback(null, 'images')
+        callback(null, 'images');
     },
     //le nom a attribué au fichier qui sera stocké
     filename: (res, file, callback) => {
@@ -21,15 +21,15 @@ const storage = multer.diskStorage({
         // recupère l'extension du ficher
         const extention = MIME_TYPE[file.mimetype];
         // fonction qui va assembler le nom du fichier avec le name récupéré, la date pour s'assurer d'avoir un nom unique, un . et l'extension
-        callback(null, name + Date.now() + '.' + extention)
+        callback(null, name + Date.now() + '.' + extention);
     }
  });
 
- //exporte storage de multer en acceptant un "single" fichier qui sera une "image" (peut aussi renvoyer un array par ex.)
+ // exporte storage de multer en acceptant un "single" fichier qui sera une "image" (peut aussi renvoyer un array par ex.)
  // multer accroche le file au body
 module.exports = (req, res, next) => {
-    console.log('je rentre dans le multer')    
+    console.log('je rentre dans le multer');
     multer({ storage }).single('image');
-    console.log('je sors du multer')
+    console.log('je sors du multer');
     next()
 }

@@ -50,7 +50,9 @@ exports.getBestBooks = async (req, res, next) =>{
 
 exports.createNewBook = async (req, res, next) =>{
     //stock le body de la requete parsée en JSON
-    console.log('je rentre dans la création d un book')
+    console.log(req.body);
+    console.log('je rentre dans la création d un book');
+    
     const receivedBookObject = req.body.book;
     try {
         //génère un nouveau book
@@ -62,7 +64,7 @@ exports.createNewBook = async (req, res, next) =>{
             //y ajoute l'url reconstituée : protocole de la requete + req.get???
             imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
             // ajoute une avergae rating à -1 de base pour un affichage neutre avec averageRating >0
-            averageRating:-1
+            averageRating: req.ratings.grade
             });
             console.log(book.imageUrl);
         //enregistre le new book dans la DB
@@ -114,9 +116,9 @@ const CalcAverage = (book) => {
     //divise par le nombre total de notes
     const result = sum /= grades.length;
     //renvoi le resultat arrondi à 1 decimale
-    return result.toFixed(1)
+    return result.toFixed(1);
 }
-exports.CalcAverageRating = async(req, res, next) =>{
+exports.CalcAverageRating = async(req, res, next) => {
     try {
     //récupère le book demandé dans l'id de la requete
     const bookAverageToUpdate = await Book.findOne({_id: req.params.id});
@@ -126,7 +128,7 @@ exports.CalcAverageRating = async(req, res, next) =>{
     bookAverageToUpdate.averageRating = newAverage;
     //sauvegarde dans la DB
     await bookAverageToUpdate.save();
-    return res.status(201).json('note ajoutee avec succes')
+    return res.status(201).json('note ajoutee avec succes');
     }
     catch (error) {
         return res.status(400).json({ message : 'erreur sur la mise à jour de la note moyenne'});
@@ -135,12 +137,14 @@ exports.CalcAverageRating = async(req, res, next) =>{
 
 exports.updateBook = async (req, res, next) => {
     try{
-        console.log('je rentre dans l update')
+        console.log('je rentre dans l update');
         //crée un nouvel objet
-        let updatedBook = {};
+        let updatedBook = null;
+        console.log(updatedBook)
+        console.log(req.file)
         //entre si il y a un objet dans la requete
         if (!!req.file){
-            console.log('j ai un file')
+            console.log('j ai un file');
             //stocke les infos du book envoyé en string dans une variable
             const stringReceivedBook = req.body.book;
             //parse le book en objet JSON
@@ -155,21 +159,21 @@ exports.updateBook = async (req, res, next) => {
         }
         //si pas d'image
         else {
+            console.log('j ai pas de file mais je suis dans le else');
             //rempli l'objet avec le body dela requete qui est deja en JSON parsé
             updatedBook = {
-                ...res.body
+                ...req.body.book
             };
         }
-        // puis dans les deux cas, supprime le userID
-        delete receivedBookObject.userId;
-        //cherche le livre a modifier existant dans le DB
+        console.log(updatedBook);
+        //cherche le livre a modifier existant dans la DB
         const bookToUpdate = await Book.findOne({_id: req.params.id});
         //si l'Id du user est différent de celui qui a créé le livre, on renvoi une erreur
         if (bookToUpdate.userId != req.auth.userId) {
-            return req.status(401).json({ message: 'Non authorized'})
+            return req.status(401).json({ message: 'Non authorized'});
         } else {
             //si les id correspondent alors on mets le livre à jour
-            await Book.updateOne({_id: req.params.id}, {updatedBook, _id: req.params.id})
+            await Book.updateOne({_id: req.params.id}, {updatedBook, _id: req.params.id});
         }
     }
     catch (error) {
@@ -183,14 +187,14 @@ exports.deleteBook = async (req, res, next) => {
         const bookToDelete = await Book.findOne({_id: req.params.id});
         //si l'id envoyé est différent de celui du propriétaire du livre, on renvoi une erreur
         if (bookToDelete.userId != req.auth.userId) {
-            return req.status(401).json({ message: 'Non authorized'})
+            return req.status(401).json({ message: 'Non authorized'});
         } else {
             //quand les id correspondent on recupère le file de l'image associé au book avec split(avant /image dans l'imageUrl du book recupéré)
             const fileName = bookToDelete.imageUrl.split('/images')[1];
             //supprime l'image du stockage des files avec la propriété unlink -> revoir fs
-            await fs.unlink(`images'${fileName}`)
+            await fs.unlink(`images'${fileName}`);
             //supprime le book de la DB
-            await Book.deleteOne({_id: req.params.id})
+            await Book.deleteOne({_id: req.params.id});
         }
         return res.status(200).json({message : 'livre supprime avec succes'});
     }

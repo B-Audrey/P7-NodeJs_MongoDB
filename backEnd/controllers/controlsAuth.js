@@ -33,14 +33,14 @@ exports.logIn = async (req, res, next) => {
     try {
         //on cherche le user dans la DB
         const userToLogIn = await User.findOne({email: req.body.email});
-        console.log('1' + userToLogIn)
+        console.log('1' + userToLogIn);
         //si il est inexistant, on sort de la fonction
         if (!userToLogIn) {
-            return res.status(401).json({message : 'identifant ou mot de passse incorrect'})
+            return res.status(401).json({message : 'identifant ou mot de passse incorrect'});
         }
         //si l'utilisateur est existant, la méthode bcrypt compare prend en 1er param le MdP envoyé et celui dejà haché stocké dans la DB
         const goodPassword = await bcrypt.compare(req.body.password, userToLogIn.password);
-        console.log('2' + goodPassword)
+        console.log('2' + goodPassword);
         // si compare renvoie false
         if (!goodPassword) {
             return res.status(401).json({message : 'identifant ou mot de passse incorrect'});

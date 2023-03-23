@@ -5,17 +5,19 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const dbLink = 'mongodb+srv://AudeRey:yFAc2RXaOq5ekyKl@GrimoireDB.x4nhhec.mongodb.net/?retryWrites=true&w=majority';
-
-
+const bodyParser = require('body-parser');
+// const multer = require('multer');
+// const upload = multer();
 
 const dbConnect = async (dbLink) => {
   try{
     let res = await mongoose.connect(dbLink, { useNewUrlParser: true, useUnifiedTopology: true })
     if (!!res){
-      console.log('Connexion à MongoDB réussie !')}
+      console.log('Connexion à MongoDB réussie !')
+    }
   }
   catch (error) {
-    console.log('error')
+    console.log('error');
   }
 }
 dbConnect(dbLink);
@@ -36,7 +38,11 @@ const booksRoutes = require('./routes/routesBooks');
 const authRoutes = require('./routes/routesAuth');
 
 //converti tout express en JSON
-app.use(express.json());
+app.use(bodyParser.json());
+// app.use(upload.array()); 
+// app.use(express.static('public'));
+
+
 //défini la route a joindre pour les requetes contenant les files 'images', 2x images ??? Pourquoi ?
 app.use('/image', express.static(path.join('images', 'images')));
 //applique les routes définies dans le fichier routes pour les users et pour les books
