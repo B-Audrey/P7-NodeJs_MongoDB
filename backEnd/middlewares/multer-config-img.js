@@ -15,19 +15,14 @@ const storage = multer.diskStorage({
     filename: (res, file, callback) => {
         //prend le nom du fichier envoyé et split les valeurs entre chaque espace pour ensuite les assembler avec des "_"
         const name = file.originalname.split(' ').join('_');
+        nameInArray = name.split('.');
+        nameInArray.pop();
         // recupère l'extension du ficher
         const extention = MIME_TYPE[file.mimetype];
         // assemble le name récupéré, la date pour s'assurer d'avoir un nom unique, un . et l'extension
-        callback(null, name + Date.now() + '.' + extention);
+        callback(null, nameInArray + Date.now() + '.' + extention);
     }
  });
- // exporte storage de multer en acceptant un "single" fichier qui sera une "image"
- // multer accroche le file au req.body
-// module.exports = (req, res, next) => {
-//     console.log('je rentre dans ma focntion multer');
-//     multer({ storage }).single('image');
-//     console.log(req.file)
-//     next()
-// }
-
+// exporte storage de multer en acceptant un "single" fichier qui sera une "image"
+// multer accroche le file au req.body et l'enregistre dans le dossier image
 module.exports = multer({ storage }).single('image');

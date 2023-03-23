@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
         req.auth = {
             userId: userId
         }
-        console.log('j ai fini l etape 1');
+        console.log('j ai fini l etape d authentification');
         next();
     }
     catch (error){

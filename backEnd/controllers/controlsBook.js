@@ -50,7 +50,6 @@ exports.getBestBooks = async (req, res, next) =>{
 
 exports.createNewBook = async (req, res, next) =>{
     //stock le body de la requete parsée en JSON
-    console.log(req.body);
     console.log('je rentre dans la création d un book');
     
     const receivedBookObject = JSON.parse(req.body.book);
@@ -63,10 +62,8 @@ exports.createNewBook = async (req, res, next) =>{
             userId: req.auth.userId,
             //y ajoute l'url reconstituée : protocole de la requete + req.get???
             imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-            // ajoute une avergae rating à -1 de base pour un affichage neutre avec averageRating >0
-            averageRating: req.ratings.grade
             });
-            console.log(book.imageUrl);
+
         //enregistre le new book dans la DB
         await book.save();
         // renvoi le nouveau book
@@ -136,38 +133,29 @@ exports.CalcAverageRating = async(req, res, next) => {
 }
 
 exports.updateBook = async (req, res, next) => {
+    console.log('je suis dans la modif')
+    receivedBookForUpdate = JSON.parse(req.body.book);
     try{
         console.log('je rentre dans l update');
         //crée un nouvel objet
-        let updatedBook = null;
+        let updatedBook = {
+            ...receivedBookForUpdate,
+        };
         console.log(updatedBook)
-        console.log(req.file)
+        // console.log(updatedBook)
+        console.log('Y a t il un file dans la requete de modif', '>>>>', req.file)
         //entre si il y a un objet dans la requete
         if (!!req.file){
-            console.log('j ai un file');
-            //stocke les infos du book envoyé en string dans une variable
-            const stringReceivedBook = req.body.book;
-            //parse le book en objet JSON
-            parseUpdatedBook = JSON.parse(stringReceivedBook);
-            //rempli l'objet
+            console.log('oui');
             updatedBook = {
-                //les nouvelles valeur du Book
-                parseUpdatedBook,
+                ...receivedBookForUpdate,
                 //la nouvelle URL de l'image 
                 imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             }; 
         }
-        //si pas d'image
-        else {
-            console.log('j ai pas de file mais je suis dans le else');
-            //rempli l'objet avec le body dela requete qui est deja en JSON parsé
-            updatedBook = {
-                ...req.body.book
-            };
-        }
-        console.log(updatedBook);
         //cherche le livre a modifier existant dans la DB
         const bookToUpdate = await Book.findOne({_id: req.params.id});
+        console.log('j ai le book')
         //si l'Id du user est différent de celui qui a créé le livre, on renvoi une erreur
         if (bookToUpdate.userId != req.auth.userId) {
             return req.status(401).json({ message: 'Non authorized'});
@@ -183,18 +171,23 @@ exports.updateBook = async (req, res, next) => {
 
 exports.deleteBook = async (req, res, next) => {
     try {
+        console.log('je rentre dans le delete')
         //recupère le livre a supprimer
         const bookToDelete = await Book.findOne({_id: req.params.id});
         //si l'id envoyé est différent de celui du propriétaire du livre, on renvoi une erreur
         if (bookToDelete.userId != req.auth.userId) {
             return req.status(401).json({ message: 'Non authorized'});
         } else {
+            console.log('je suis autorisee a delete')
             //quand les id correspondent on recupère le file de l'image associé au book avec split(avant /image dans l'imageUrl du book recupéré)
             const fileName = bookToDelete.imageUrl.split('/images')[1];
             //supprime l'image du stockage des files avec la propriété unlink -> revoir fs
-            await fs.unlink(`images'${fileName}`);
+            const deleteImg = await fs.unlink(`images'${fileName}`, async () => {
+                const deleteBook = await Book.deleteOne({_id: req.params.id});
+            });
             //supprime le book de la DB
-            await Book.deleteOne({_id: req.params.id});
+            
+            console.log('j ai delete')
         }
         return res.status(200).json({message : 'livre supprime avec succes'});
     }
