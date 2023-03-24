@@ -158,22 +158,21 @@ exports.updateBook = async (req, res, next) => {
 
 exports.deleteBook = async (req, res, next) => {
     try {
-        console.log('je rentre dans le delete')
         //recupère le livre a supprimer
         const bookToDelete = await Book.findOne({_id: req.params.id});
         //si l'id envoyé est différent de celui du propriétaire du livre, on renvoi une erreur
         if (bookToDelete.userId != req.auth.userId) {
-            return req.status(401).json({ message: 'Non authorized'});
+            return res.status(401).json({ message: 'Non authorized'});
         } else {
-            console.log('je suis autorisee a delete')
             //quand les id correspondent on recupère le file de l'image associé au book avec split(avant /image dans l'imageUrl du book recupéré)
-            const fileName = bookToDelete.imageUrl.split('/images')[1];
-            //supprime l'image du stockage des files avec la propriété unlink -> revoir fs
-            const deleteImg = await fs.unlink(`images'${fileName}`, async () => {
+            const fileName = bookToDelete.imageUrl.split('images/')[1];
+            //supprime l'image des files avec unlink qui prends le chemin en params et une callback a effectuer (delete dans la DB 
+            const deleteImg = await fs.unlink(`./images/${fileName}`, async (error) => {
+                if(error){
+                    console.log(error);
+                }
                 const deleteBook = await Book.deleteOne({_id: req.params.id});
             });
-            //supprime le book de la DB
-            console.log('j ai fais le delete')
         }
         return res.status(200).json({message : 'livre supprime avec succes'});
     }
