@@ -49,30 +49,21 @@ exports.getBestBooks = async (req, res, next) =>{
 }
 
 exports.createNewBook = async (req, res, next) =>{
-    //stock le body de la requete parsée en JSON
-    console.log('je rentre dans la création d un book');
-    
-    const receivedBookObject = JSON.parse(req.body.book);
-    try {
-        //génère un nouveau book
-        const book = new Book({
-            //passe les valeurs contenues dans l'objet
-            ...receivedBookObject,
-            //y ajoute l'iD de l'user qui est dans la requete
-            userId: req.auth.userId,
-            //y ajoute l'url reconstituée : protocole de la requete + req.get???
-            imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+    console.log('je rentre dans la création d un book'); 
+    const receivedBookObject = JSON.parse(req.body.book);//récupère le body de la requete envoyée en string et la parse
+    try {  
+        const bookToCreate = new Book({
+            ...receivedBookObject, //passe les valeurs contenues dans l'objet
+            userId: req.auth.userId, // assigne l'iD de l'user qui est dans la requete (pour être sûr que ce soit le bon)
+            imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`// y ajoute l'url reconstituée
             });
-
-        //enregistre le new book dans la DB
-        await book.save();
-        // renvoi le nouveau book
-        return res.status(201).json({message: 'Livre cree avec succes' + book});
+        await bookToCreate.save();
+        return res.status(201).json({message: 'Livre cree avec succes' + bookToCreate});
     }
      catch (error) {
         res.status(400).json({ error });
     }
-};
+}
 
 exports.addNewGrade = async(req, res, next) => {
     //supprime l'iD de la requete pour que le bon soit attribué ensuite
@@ -133,35 +124,31 @@ exports.CalcAverageRating = async(req, res, next) => {
 }
 
 exports.updateBook = async (req, res, next) => {
-    console.log('je suis dans la modif')
-    receivedBookForUpdate = JSON.parse(req.body.book);
     try{
-        console.log('je rentre dans l update');
-        //crée un nouvel objet
-        let updatedBook = {
-            ...receivedBookForUpdate,
-        };
-        console.log(updatedBook)
-        // console.log(updatedBook)
-        console.log('Y a t il un file dans la requete de modif', '>>>>', req.file)
-        //entre si il y a un objet dans la requete
-        if (!!req.file){
-            console.log('oui');
-            updatedBook = {
-                ...receivedBookForUpdate,
-                //la nouvelle URL de l'image 
-                imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-            }; 
+        let receivedBookForUpdate = {};
+        if(!!req.file) {
+            receivedBookForUpdate = JSON.parse(req.body.book);//récupère le body de la requete envoyée en string et la parse
+            receivedBookForUpdate.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;// y ajoute l'url reconstituée
         }
-        //cherche le livre a modifier existant dans la DB
-        const bookToUpdate = await Book.findOne({_id: req.params.id});
-        console.log('j ai le book')
-        //si l'Id du user est différent de celui qui a créé le livre, on renvoi une erreur
-        if (bookToUpdate.userId != req.auth.userId) {
-            return req.status(401).json({ message: 'Non authorized'});
-        } else {
-            //si les id correspondent alors on mets le livre à jour
-            await Book.updateOne({_id: req.params.id}, {updatedBook, _id: req.params.id});
+        if(!req.file) {
+            receivedBookForUpdate = {...req.body};
+        }
+        receivedBookForUpdate.userId = req.auth.userId;
+        try{
+            const bookToUpdate = await Book.findOne({_id: req.params.id});
+            if(bookToUpdate.userId != req.auth.userId) {
+                res.status(401).json({message: 'non autorise'});
+            };
+        }
+        catch(error){
+            return res.status(401).json({ error });
+        }
+        console.log(receivedBookForUpdate)
+        try{
+            const updatedBook = await Book.updateOne({_id: req.params.id}, {...receivedBookForUpdate, _id:req.params.id});
+        }
+        catch (error){
+            return res.status(400).json({ error });
         }
     }
     catch (error) {
@@ -186,8 +173,7 @@ exports.deleteBook = async (req, res, next) => {
                 const deleteBook = await Book.deleteOne({_id: req.params.id});
             });
             //supprime le book de la DB
-            
-            console.log('j ai delete')
+            console.log('j ai fais le delete')
         }
         return res.status(200).json({message : 'livre supprime avec succes'});
     }

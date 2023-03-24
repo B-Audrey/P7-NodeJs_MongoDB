@@ -6,8 +6,7 @@ const app = express();
 const path = require('path');
 const dbLink = 'mongodb+srv://AudeRey:yFAc2RXaOq5ekyKl@GrimoireDB.x4nhhec.mongodb.net/?retryWrites=true&w=majority';
 const bodyParser = require('body-parser');
-// const multer = require('multer');
-// const upload = multer();
+
 
 const dbConnect = async (dbLink) => {
   try{
@@ -39,12 +38,12 @@ const authRoutes = require('./routes/routesAuth');
 
 //converti tout express en JSON
 app.use(bodyParser.json());
-// app.use(upload.array()); 
-// app.use(express.static('public'));
+
+app.use(express.static('images'));
 
 
-//défini la route a joindre pour les requetes contenant les files 'images', 2x images ??? Pourquoi ?
-app.use('/image', express.static(path.join('images', 'images')));
+//défini la route a joindre pour les requetes contenant les files 'images'
+app.use('/images', express.static(path.join('images')));
 //applique les routes définies dans le fichier routes pour les users et pour les books
 app.use('/api/books', booksRoutes);
 app.use('/api/auth', authRoutes);
