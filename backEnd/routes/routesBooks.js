@@ -1,12 +1,10 @@
-//importe express
 const express = require('express');
-// POURQUOI ? JAMAIS LUE ?
-// const { findOne } = require('../models/modelBook');
+
 //importe les fichiers avec les fonctions qui vont être lues les unes après les autres dans les routes
 const auth = require('../middlewares/auth');
 const multer = require('../middlewares/multer-config-img');
 const bookCtrls = require('../controllers/controlsBook');
-// const parseBody = require('../middlewares/body-parser');
+
 //stocke les routes express dans la variable router
 const router = express.Router();
 

@@ -38,7 +38,6 @@ const authRoutes = require('./routes/routesAuth');
 
 //converti tout express en JSON
 app.use(bodyParser.json());
-
 app.use(express.static('images'));
 
 

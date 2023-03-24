@@ -7,9 +7,18 @@ JSON pour ajout d'un Book à la DB
 "genre": "Aventure"
 }
 
-JSON pour ajout d'un User à la DB
+JSON pour connexion d'un User à la DB
 {
     "email": "audrey@moi.fr",
     "password": "MotDePasse"
 }
 
+User 2
+florian@moi.fr
+PassWord
+
+ethan@moi.fr
+Baby1
+
+william@moi.fr
+Baby2
