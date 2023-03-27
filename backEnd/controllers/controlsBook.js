@@ -47,7 +47,7 @@ exports.createNewBook = async (req, res, next) => {
             imageUrl:`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             });
         await bookToCreate.save();
-        return res.status(201).json( {message: 'Livre ajoute avec succes'} );
+        return res.status(201).json({message: 'Livre ajoute avec succes'});
     }
      catch (error) {
         return res.status(400).json({ error });
@@ -57,14 +57,14 @@ exports.createNewBook = async (req, res, next) => {
 exports.addNewGrade = async (req, res, next) => {
     try{
         if(req.body.rating > 5 || req.body.rating < 0) {
-            return res.status(403).json( {message : 'note maximale depassee'} );
+            return res.status(400).json({message : 'note maximale depassee'});
         }
         const dataToPush = {userId : req.auth.userId, grade: req.body.rating};
         const bookRateToUpdate = await Book.findOne({_id: req.params.id});
         const ratingArray = bookRateToUpdate.ratings;
         const alreadyAddGrade = ratingArray.find((rating) => rating.userId === req.auth.userId);
         if (!!alreadyAddGrade) {
-            return res.status(400).json( {message: 'deja vote'} )
+            return res.status(403).json({message: 'deja vote'})
         }
         bookRateToUpdate.ratings.push(dataToPush);
         await bookRateToUpdate.save();
@@ -117,13 +117,11 @@ exports.updateBook = async (req, res, next) => {
             receivedBookForUpdate.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;// y ajoute l'url reconstituée
             //si j'ai un file a remplacer, je supprime celle existante
             const fileNameToDelete = bookToUpdate.imageUrl.split('images/')[1];
-                    const deleteImg = await fs.unlink(`./images/${fileNameToDelete}`, async (error) => {
-                        if(error){
-                            console.log(error);
-                        }
-                        console.log('image localement supprimee')
-                    });
-
+            const deleteImg = await fs.unlink(`./images/${fileNameToDelete}`, async (error) => {
+                if(error){
+                    console.log(error);
+                }
+            });
         }
         if(!req.file) {
             receivedBookForUpdate = {...req.body};
@@ -154,6 +152,6 @@ exports.deleteBook = async (req, res, next) => {
         return res.status(200).json({message : 'livre supprime avec succes'});
     }
     catch (error) {
-        return res.status(404).json({error});
+        return res.status(400).json({error});
     }
  }
