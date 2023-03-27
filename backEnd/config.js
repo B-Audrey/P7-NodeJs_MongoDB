@@ -1,3 +1,4 @@
+//2 profils, voir comment configurer 2env et cacher les id/MdP
 module.exports = {
     db: {
       dev: 'mongodb+srv://AudeRey:yFAc2RXaOq5ekyKl@GrimoireDB.x4nhhec.mongodb.net/?retryWrites=true&w=majority',

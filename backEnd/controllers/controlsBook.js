@@ -1,4 +1,3 @@
-//importe le schema mongoose Book défini
 const Book = require('../models/modelBook');
 
 //utilise FileSystem
@@ -96,7 +95,7 @@ exports.CalcAverageRating = async(req, res, next) => {
         const newAverage = CalcAverage(bookAverageToUpdate);
         bookAverageToUpdate.averageRating = newAverage;
         await bookAverageToUpdate.save();
-        return res.status(201).json({bookAverageToUpdate});
+        return res.status(201).json(bookAverageToUpdate);
     }
     catch (error) {
         return res.status(400).json({ error });

@@ -13,12 +13,3 @@ JSON pour connexion d'un User à la DB
     "password": "MotDePasse"
 }
 
-User 2
-florian@moi.fr
-PassWord
-
-ethan@moi.fr
-Baby1
-
-william@moi.fr
-Baby2

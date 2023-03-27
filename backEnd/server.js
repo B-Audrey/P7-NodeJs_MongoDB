@@ -3,7 +3,7 @@ const http = require('http');
 //importe le fichier app.js
 const app = require('./app');
 
-//fonction qui défini le port sur lequel écouter les requetes
+//défini le port sur lequel écouter les requetes
 const normalizePort = (val) => {
   //déclare la valeur du port et la parse ne un nombre entier qui sera calculé sur une base 10
   const port = parseInt(val, 10);
@@ -25,7 +25,7 @@ const port = normalizePort(process.env.PORT || '4000');
 // POURQUOI SET ? QUELLE UTILITE DE CETTE LIGNE ?
 app.set('port', port);
 
-//fonction qui le retour des erreurs
+//retour des erreurs
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;

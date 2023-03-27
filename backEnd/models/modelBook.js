@@ -1,7 +1,5 @@
-//importe Mongoose pour avoir accès aux propriété mongoose dans le fichier
 const mongoose = require('mongoose');
 
-//défini le shcema de données valides a utiliser pour echanger des "Book" avec la DB
 const bookSchema = mongoose.Schema({
     userId: { type: String, required: true },
     title: { type: String, required: true},
