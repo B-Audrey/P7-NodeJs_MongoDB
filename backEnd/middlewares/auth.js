@@ -1,7 +1,7 @@
 const jsonWebToken = require('jsonwebtoken');
 
 //on exporte la fonction de récupération du token
-module.exports = async (req, res, next) => {
+const addTokenAuth = async (req, res, next) => {
     try {
         //on recupère le token dans la requete qui sera après bearer (donc position 1, le 0 étant l'espace après bearer)
         const token = req.headers.authorization.split(' ')[1];
@@ -17,3 +17,5 @@ module.exports = async (req, res, next) => {
         return res.status(401).json(error);
     }
 }
+
+module.exports = addTokenAuth;

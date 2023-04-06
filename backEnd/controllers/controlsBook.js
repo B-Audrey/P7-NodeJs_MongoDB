@@ -88,16 +88,13 @@ exports.calcAverageRating = async(req, res, next) => {
         return res.status(201).json(bookAverageToUpdate);
     }
     catch (error) {
-        return res.status(400).json({ error });
+        return res.status(400).json(error);
     }
 }
 
 exports.updateBook = async (req, res, next) => {
     try{
         const bookToUpdate = await Book.findOne({_id: req.params.id});
-        if(bookToUpdate.userId != req.auth.userId) {
-            res.status(401).json({message: 'non autorise'});
-        }
         let receivedBookForUpdate = {};
         if(req.file?.originalname) {
             receivedBookForUpdate = JSON.parse(req.body.book);
@@ -125,20 +122,16 @@ exports.updateBook = async (req, res, next) => {
 exports.deleteBook = async (req, res, next) => {
     try {
         const bookToDelete = await Book.findOne({_id: req.params.id});
-        if (bookToDelete.userId != req.auth.userId) {
-            return res.status(401).json({ message: 'Authentification requise'});
-        } else {
-            const fileName = bookToDelete.imageUrl.split('images/')[1];
-            await fs.unlink(`./images/${fileName}`, async (error) => {
-                if(error){
-                    console.log(error);
-                }
-                await Book.deleteOne({_id: req.params.id});
-            });
-        }
+        const fileName = bookToDelete.imageUrl.split('images/')[1];
+        await fs.unlink(`./images/${fileName}`, async (error) => {
+            if(error){
+                console.log(error);
+            }
+            await Book.deleteOne({_id: req.params.id});
+        });
         return res.status(204).json({message : 'livre supprime avec succes'});
     }
     catch (error) {
         return res.status(404).json(error);
     }
- }
+}

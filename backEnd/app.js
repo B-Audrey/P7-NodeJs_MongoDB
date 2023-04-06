@@ -35,14 +35,13 @@ app.use((req, res, next) => {
 
 //converti tout express en JSON
 app.use(bodyParser.json());
+//renvoi les erreurs de requete si il y en a 
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status).json(err.message);
 });
+// capture les images du dossiers images
 app.use(express.static('images'));
-
-
-
 //défini la route a joindre pour les requetes contenant les files 'images'
 app.use('/images', express.static(path.join('images')));
 //applique les routes définies dans le fichier routes pour les users et pour les books
