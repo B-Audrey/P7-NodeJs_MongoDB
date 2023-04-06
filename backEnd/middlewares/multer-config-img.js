@@ -2,7 +2,7 @@ const multer = require('multer');
 //defini les types de fichiers acceptés
 const MIME_TYPE = {
     'image/jpg' : 'jpg',
-    'image/jpeg' : 'jpg',
+    'image/jpeg' : 'jpeg',
     'image/png' : 'png'
 };
 // fonction diskStorage qui prends en params deux autres fonctions possibbles, ici les deux 

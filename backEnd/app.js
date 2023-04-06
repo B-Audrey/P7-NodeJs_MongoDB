@@ -4,13 +4,14 @@ const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 const path = require('path');
-const dbLink = 'mongodb+srv://AudeRey:yFAc2RXaOq5ekyKl@GrimoireDB.x4nhhec.mongodb.net/?retryWrites=true&w=majority';
 const bodyParser = require('body-parser');
+const booksRoutes = require('./routes/routesBooks');
+const authRoutes = require('./routes/routesAuth');
 
 
-const dbConnect = async (dbLink) => {
+const dbConnect = async () => {
   try{
-    let res = await mongoose.connect(dbLink, { useNewUrlParser: true, useUnifiedTopology: true })
+    const res = await mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true })
     if (!!res){
       console.log('Connexion à MongoDB réussie !')
     }
@@ -19,7 +20,7 @@ const dbConnect = async (dbLink) => {
     console.log('error');
   }
 }
-dbConnect(dbLink);
+dbConnect();
 
 //CORS - autorise l'accès à tous
 app.use((req, res, next) => {
@@ -32,13 +33,14 @@ app.use((req, res, next) => {
   next();
 });
 
-//appelle les routes
-const booksRoutes = require('./routes/routesBooks');
-const authRoutes = require('./routes/routesAuth');
-
 //converti tout express en JSON
 app.use(bodyParser.json());
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status).json(err.message);
+});
 app.use(express.static('images'));
+
 
 
 //défini la route a joindre pour les requetes contenant les files 'images'

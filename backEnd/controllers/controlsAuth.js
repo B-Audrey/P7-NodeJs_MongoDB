@@ -1,5 +1,3 @@
-//importe bcrypt: un package pour crypter les MdP dans un seul sens
-//et pouvoir vérifier si les 2 hashs générés proviennent de la même string
 const bcrypt = require('bcrypt');
 const jsonWebToken = require('jsonwebtoken');
 const User = require('../models/modelUser');
@@ -17,7 +15,7 @@ exports.createNewUser = async(req, res, next) => {
         return res.status(201).json({message: 'Utilisateur cree avec succes'});
     }
     catch (error) {
-        return res.status(400).json({ error });
+        return res.status(400).json(error);
     }
 }
 
@@ -40,13 +38,13 @@ exports.logIn = async (req, res, next) => {
             token: jsonWebToken.sign(
                 { userId: userToLogIn._id},
                 //clef secrete du token
-                'RANDOM_SECRET_KET_TO_CREATE_AND_READ_A_TOKEN',
+                'RANDOM_SECRET_KEY_TO_CREATE_AND_READ_A_TOKEN',
                 //fixe la duree de validité du token
-                { expiresIn: '24h'}
+                { expiresIn: '4h'}
                 )
             })
     }
     catch (error) {
-        return res.status(500).json({ error });
+        return res.status(404).json(error);
     }
 }
