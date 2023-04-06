@@ -92,6 +92,15 @@ exports.calcAverageRating = async(req, res, next) => {
     }
 }
 
+const deleteBookImg = async (book) => {
+    const fileNameToDelete = book.imageUrl.split('images/')[1];
+            await fs.unlink(`./images/${fileNameToDelete}`, (error) => {
+                if(error){
+                    console.log(error);
+                }
+            });
+}
+
 exports.updateBook = async (req, res, next) => {
     try{
         const bookToUpdate = await Book.findOne({_id: req.params.id});
@@ -99,12 +108,7 @@ exports.updateBook = async (req, res, next) => {
         if(req.file?.originalname) {
             receivedBookForUpdate = JSON.parse(req.body.book);
             receivedBookForUpdate.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
-            const fileNameToDelete = bookToUpdate.imageUrl.split('images/')[1];
-            await fs.unlink(`./images/${fileNameToDelete}`, async (error) => {
-                if(error){
-                    console.log(error);
-                }
-            });
+            await deleteBookImg(bookToUpdate);
         }
         else {
             receivedBookForUpdate = {...req.body};
@@ -122,13 +126,8 @@ exports.updateBook = async (req, res, next) => {
 exports.deleteBook = async (req, res, next) => {
     try {
         const bookToDelete = await Book.findOne({_id: req.params.id});
-        const fileName = bookToDelete.imageUrl.split('images/')[1];
-        await fs.unlink(`./images/${fileName}`, async (error) => {
-            if(error){
-                console.log(error);
-            }
-            await Book.deleteOne({_id: req.params.id});
-        });
+        await deleteBookImg(bookToDelete);
+        await Book.deleteOne({_id: req.params.id});
         return res.status(204).json({message : 'livre supprime avec succes'});
     }
     catch (error) {
