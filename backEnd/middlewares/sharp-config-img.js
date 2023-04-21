@@ -7,18 +7,13 @@ const MIME_TYPE = {
     'image/png' : 'png'
 };
 
-const giveAFileName = (fileToRename) => {
-    return Date.now() + '.' + MIME_TYPE[fileToRename.mimetype];
-}
-
 const optimizeReceivedFile = async (req, res, next) => {
     try {
         if (req.file) {
-            const newName = giveAFileName(req.file);
-            req.file.filename = newName;
+            req.file.filename = Math.floor(Math.random()*100) +''+ Date.now() + '.' + MIME_TYPE[req.file.mimetype];
             await sharp(req.file.buffer)
                 .resize({height : 400})
-                .toFile('./images/' + newName);
+                .toFile('./images/' + req.file.filename);
         }
         next();
     }
