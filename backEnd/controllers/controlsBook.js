@@ -36,11 +36,11 @@ exports.getBestBooks = async (req, res, next) =>{
 
 exports.createNewBook = async (req, res, next) => {
     const receivedBookObject = JSON.parse(req.body.book);
-    const nextYear = Date.getFullYear()+1;
+    const nextYear = new Date().getFullYear()+1;
     if (receivedBookObject.title.length >= 100 || receivedBookObject.author.length >= 50 || receivedBookObject.genre.length >= 50){
         return res.status(400).json({message: "Texte trop long. Veuillez raccourcir"})
     }
-    if (receivedBookObject.year.length != 4 || receivedBookObject.year > nextYear){
+    if (receivedBookObject.year > nextYear){
         return res.status(400).json({message: "Veuillez renseigner une annee a 4 chiffres"})
     }
     try {
@@ -88,25 +88,29 @@ const deleteBookImg = async (book) => {
     const fileNameToDelete = book.imageUrl.split('images/')[1];
     await fs.unlink(`./images/${fileNameToDelete}`, (error) => {
         if(error){
-            console.log(error);
+            console.log(error, fileNameToDelete);
         }
     });
 }
 
 exports.updateBook = async (req, res, next) => {
     try{
+        const nextYear = new Date().getFullYear()+1;
         const bookToUpdate = await Book.findOne({_id: req.params.id});
-        let receivedBookForUpdate = {};
-        if(req.file?.originalname) {
-            receivedBookForUpdate = JSON.parse(req.body.book);
-            receivedBookForUpdate.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
+        let jsonBookForUpdate = req.body;
+        if(req.file != undefined) {
+            jsonBookForUpdate = JSON.parse(req.body.book);
             await deleteBookImg(bookToUpdate);
+            jsonBookForUpdate.imageUrl = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`;
         }
-        else {
-            receivedBookForUpdate = {...req.body};
+        if (jsonBookForUpdate.title.length >= 100 || jsonBookForUpdate.author.length >= 50 || jsonBookForUpdate.genre.length >= 50){
+            return res.status(400).json({message: "Texte trop long. Veuillez raccourcir"})
         }
-        receivedBookForUpdate.userId = req.auth.userId;
-        await Book.updateOne({_id: req.params.id}, {...receivedBookForUpdate, _id:req.params.id});
+        if (jsonBookForUpdate.year > nextYear){
+            return res.status(400).json({message: "Veuillez renseigner une annee a 4 chiffres"})
+        }
+        jsonBookForUpdate.userId = req.auth.userId;
+        await Book.updateOne({_id: req.params.id}, {...jsonBookForUpdate, _id:req.params.id});
         return res.status(200).json({message: 'livre modifie avec succes'});
     }
     catch (error){

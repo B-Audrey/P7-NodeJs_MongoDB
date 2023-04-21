@@ -11,7 +11,7 @@ const isAllowed = async (req, res, next) => {
         }
     }
     catch (error) {
-        res.status(402).json(error)
+        res.status(404).json(error)
     }
 }
 

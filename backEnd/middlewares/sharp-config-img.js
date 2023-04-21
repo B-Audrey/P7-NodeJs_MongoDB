@@ -8,29 +8,18 @@ const MIME_TYPE = {
 };
 
 const giveAFileName = (fileToRename) => {
-    // prend le nom du fichier envoyé et split les valeurs entre chaque espace pour ensuite les assembler avec des "_" dans un []
-    const name = fileToRename.originalname
-        .split(' ')
-        .join('_');
-    // retire l'extension pour récupérer uniquement le nom
-    nameInArray = name
-        .split('.')
-        .pop();
-    // recupère l'extension du ficher
-    const extention = MIME_TYPE[fileToRename.mimetype];
-    // assemble le name récupéré, la date pour s'assurer d'avoir un nom unique, un . et l'extension
-    const newName = nameInArray + Date.now() + '.' + extention;
-    return newName;
+    return Date.now() + '.' + MIME_TYPE[fileToRename.mimetype];
 }
-
 
 const optimizeReceivedFile = async (req, res, next) => {
     try {
-        const newName = giveAFileName(req.file);
-        req.file.filename = newName;
-        await sharp(req.file.buffer)
-            .resize({height : 400})
-            .toFile('./images/' + newName);
+        if (req.file) {
+            const newName = giveAFileName(req.file);
+            req.file.filename = newName;
+            await sharp(req.file.buffer)
+                .resize({height : 400})
+                .toFile('./images/' + newName);
+        }
         next();
     }
     catch (error) {
