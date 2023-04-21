@@ -1,5 +1,7 @@
 Pour lancer le projet :
-npm run dev
+- ajouter un fichier '.env'
+- renseignez vos informations de base de données MongoDB telle que décrite quans le fichier '.env.example'
+- lancer la commande : npm run dev
 
 
 

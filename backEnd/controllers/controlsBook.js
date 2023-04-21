@@ -36,10 +36,11 @@ exports.getBestBooks = async (req, res, next) =>{
 
 exports.createNewBook = async (req, res, next) => {
     const receivedBookObject = JSON.parse(req.body.book);
+    const nextYear = Date.getFullYear()+1;
     if (receivedBookObject.title.length >= 100 || receivedBookObject.author.length >= 50 || receivedBookObject.genre.length >= 50){
         return res.status(400).json({message: "Texte trop long. Veuillez raccourcir"})
     }
-    if (receivedBookObject.year.length != 4){
+    if (receivedBookObject.year.length != 4 || receivedBookObject.year > nextYear){
         return res.status(400).json({message: "Veuillez renseigner une annee a 4 chiffres"})
     }
     try {
@@ -85,11 +86,11 @@ exports.addNewGrade = async (req, res, next) => {
 
 const deleteBookImg = async (book) => {
     const fileNameToDelete = book.imageUrl.split('images/')[1];
-            await fs.unlink(`./images/${fileNameToDelete}`, (error) => {
-                if(error){
-                    console.log(error);
-                }
-            });
+    await fs.unlink(`./images/${fileNameToDelete}`, (error) => {
+        if(error){
+            console.log(error);
+        }
+    });
 }
 
 exports.updateBook = async (req, res, next) => {
