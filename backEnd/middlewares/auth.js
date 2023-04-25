@@ -3,7 +3,6 @@ const jsonWebToken = require('jsonwebtoken');
 //on exporte la fonction de récupération du token
 const addTokenAuth = async (req, res, next) => {
     try {
-        //on recupère le token dans la requete qui sera après bearer (donc position 1, le 0 étant l'espace après bearer)
         const token = req.headers.authorization.split(' ')[1];
         //on vérifie le token envoyé avec verifiy qui prends en param le token + la clef secrete et on le stock dans une variable pour l'utiliser
         const decodedToken = jsonWebToken.verify(token, 'RANDOM_SECRET_KEY_TO_CREATE_AND_READ_A_TOKEN');

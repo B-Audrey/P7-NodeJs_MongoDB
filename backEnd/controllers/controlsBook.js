@@ -44,7 +44,6 @@ exports.createNewBook = async (req, res, next) => {
         return res.status(400).json({message: "Veuillez renseigner une annee a 4 chiffres"})
     }
     try {
-        console.log(req.file)  
         const bookToCreate = new Book({
             ...receivedBookObject,
             userId: req.auth.userId,
@@ -71,10 +70,10 @@ exports.addNewGrade = async (req, res, next) => {
         }
         const bookRateToUpdate = await Book.findOne({_id: req.params.id, "ratings.userId" : {$nin: req.auth.userId}});
         if (bookRateToUpdate) {
-        bookRateToUpdate.ratings.push({userId : req.auth.userId, grade: req.body.rating});
-        bookRateToUpdate.averageRating = calcAverage(bookRateToUpdate);
-        await bookRateToUpdate.save();
-        return res.status(201).json(bookRateToUpdate);
+            bookRateToUpdate.ratings.push({userId : req.auth.userId, grade: req.body.rating});
+            bookRateToUpdate.averageRating = calcAverage(bookRateToUpdate);
+            await bookRateToUpdate.save();
+            return res.status(201).json(bookRateToUpdate);
         } else {
             return res.status(403).json({message: 'vote impossible'})
         }
